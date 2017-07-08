@@ -4,6 +4,7 @@ var JSFtp     = require("jsftp");
 var async     = require("async");
 var exec 	  = require('child_process').exec;
 var nodemiral = require('nodemiral');
+var mysql 	  = require('mysql');
 
 //Configurations
 
@@ -15,7 +16,12 @@ var nodemiral = require('nodemiral');
 // 	pass: "sameera"
 // });
 
-
+var pool = mysql.createPool({
+	host: 'localhost',
+	user: 'root',
+	password: 'root',
+	database: 'mysql'
+});
 
 var session = nodemiral.session('10.52.209.6', {
 	username: 'sysadmin', 
@@ -62,18 +68,6 @@ var getFileArray = function (callback) {
 	});
 }
 
-//Routes
-// router.get('/test', function (req, res) {
-// 	var files = [];
-// 	ftp.ls("/home/sysadmin/SFC/NodeServerAccount", function (err, res) {
-
-// 		res.forEach(function (file) {
-// 			console.log(file);
-// 			files.push(file.name);
-// 		});
-// 		res.send(files);
-// 	});
-// });
 
 router.post('/setupConnection', function (req, res) {
 	
@@ -92,24 +86,6 @@ router.get('/getTreeStructureFromRemoteServer', function (req, res) {
 	});
 });
 
-// router.get('/downloadFilesFromRemoteServer', function (req, res) {
-// 	ftp.get(baseUrl+"/app.js", '/Users/vchans5/Desktop/07:04/app.js', function (hadErr) {
-// 		if (hadErr)
-// 			console.error('There was an error retrieving the file.');
-// 		else
-// 			console.log('File copied successfully!');
-// 	});
-// });
-
-// router.get('/executeRawCommand', function (req, res) {
-// 	ftp.raw("ls", baseUrl, function(err, data) {
-    	
-// 		if (err) return console.error(err);
-//     	console.log(data.text); // Show the FTP response text to the user 
-// 		console.log("--------------");
-//     	console.log(data.code); // Show the FTP response code to the user 
-// 	});
-// });
 
 router.post('/downloadFolder', function (req, res, next) {
 
@@ -135,14 +111,22 @@ router.post('/downloadFolder', function (req, res, next) {
 		});
 	});
 
-	//console.log(req.body.path)
-	// session.execute('sh /home/sysadmin/shellscripts/test.sh', function(err, code, logs) {
-	// 	console.log(logs.stdout);
-	// });
-	// session.execute('zip -r /home/sysadmin/shellscripts/testfolder.zip /home/sysadmin/shellscripts/testfolder', function(err, code, logs) {
-	// 	console.log(logs.stdout);
-	// });
 });
 
+router.get('/getQueryData',function(req,res){
+	pool.getConnection(function (err, connection) {
+
+		var sql = mysql.format("select * from general_log WHERE command_type = 'Query'");
+
+		connection.query(sql, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				res.send(error);
+			}
+
+			res.send(results);
+		});
+	});
+});
 
 module.exports = router;

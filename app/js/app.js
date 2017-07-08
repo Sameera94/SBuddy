@@ -6,6 +6,10 @@ myApp.config(['$routeProvider', function($routeProvider) {
         templateUrl: 'views/newConnection.html',
         controller: 'NewConnectionController'
     }).
+    when('/queryAnalyzer', {
+        templateUrl: 'views/queryAnalyzer.html',
+        controller: 'QueryAnalyzerController'
+    }).
     otherwise({
         redirectTo: '/newConnection'
     });
