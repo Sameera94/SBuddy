@@ -9,7 +9,7 @@ var session = require('express-session');
 var routes = require('./routes/routes');
 var connectionRoutes = require('./routes/connectionRoutes');
 var shellRoutes = require('./routes/shellRoutes');
-// var sqlManager = require('./routes/sqlManager');
+var sqlManager = require('./routes/sqlManger');
 
 mongoose.connect("mongodb://localhost:27017/MTIT_Library");
 
@@ -33,7 +33,7 @@ app.use(cookieParser());
 app.use('/lbs', routes);
 app.use('/connection', connectionRoutes);
 app.use('/shell', shellRoutes);
-// app.use('/sql', sqlManager);
+app.use('/sql', sqlManager);
 
 app.get('/', function (req, res) {
    res.sendfile('app/index.html');

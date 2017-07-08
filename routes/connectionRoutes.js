@@ -122,7 +122,6 @@ router.get('/getQueryData',function(req,res){
 			if (error) {
 				res.send(error);
 			}
-
 			res.send(results);
 		});
 	});

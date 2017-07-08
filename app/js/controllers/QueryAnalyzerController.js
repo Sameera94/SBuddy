@@ -16,7 +16,8 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 		$http.get('/connection/getQueryData', {
 		}).success(function (data) {
 			$scope.queryData = data
-			$timeout(pooling, 5000);
+			insertDataToDB(data)
+			$timeout(pooling, 10000);
 			console.log("New loop started...")
 		}).error(function (error) {
 			console.log(error);
@@ -24,5 +25,22 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 	};
 
 	pooling();
+
+
+	var insertDataToDB = function(array) {
+		$http.post('/sql/insertNewQueryArray', {
+			data: array
+		}).success(
+			function (data) {
+				console.log(data)
+			}
+		).error(
+			function (error) {
+				console.log(error);
+			}
+		);
+	}
+	
+		
 
 }]);
