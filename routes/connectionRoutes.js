@@ -116,7 +116,7 @@ router.post('/downloadFolder', function (req, res, next) {
 router.get('/getQueryData',function(req,res){
 	pool.getConnection(function (err, connection) {
 
-		var sql = mysql.format("select * from general_log WHERE command_type = 'Query'");
+		var sql = mysql.format("select * from general_log WHERE command_type = 'Query' order by event_time DESC");
 
 		connection.query(sql, function (error, results, fields) {
 			connection.release();
