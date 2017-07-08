@@ -1,46 +1,62 @@
 myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$routeParams', '$timeout', function ($scope, $http, $location, $routeParams, $timeout) {
 
 	$scope.queryData = []
+	var isListening = false;
+	$scope.logsArray = []
 
-	var getAllExecutedQueryData = function () {
-		$http.get('/connection/getQueryData', {
-		}).success(function (data) {
-			$scope.queryData = data
-			console.log(data)
-		}).error(function (error) {
-			console.log(error);
-		});
+	// var getAllExecutedQueryData = function () {
+	// 	$http.get('/connection/getQueryData', {
+	// 	}).success(function (data) {
+	// 		$scope.queryData = data
+	// 		console.log(data)
+	// 	}).error(function (error) {
+	// 		console.log(error);
+	// 	});
+	// }
+
+	var addLogItem = function(data,status){
+		var time = new Date();
+
+		$scope.logsArray.push({
+			"time": time,
+			"data": data,
+			"color": status
+		})
 	}
 
 	var pooling = function() {
-		$http.get('/connection/getQueryData', {
-		}).success(function (data) {
-			$scope.queryData = data
-			insertDataToDB(data)
-			$timeout(pooling, 10000);
-			console.log("New loop started...")
-		}).error(function (error) {
-			console.log(error);
-		});
+		if(isListening){
+			$http.get('/connection/getQueryData', {
+			}).success(function (data) {
+				$scope.queryData = data
+			}).error(function (error) {
+				console.log(error);
+			});
+		}
+		$timeout(pooling, 5000);
 	};
 
 	pooling();
 
-
-	var insertDataToDB = function(array) {
-		$http.post('/sql/insertNewQueryArray', {
-			data: array
-		}).success(
-			function (data) {
-				console.log(data)
-			}
-		).error(
-			function (error) {
-				console.log(error);
-			}
-		);
+	$scope.startListener = function() {
+		addLogItem("Start listener",2);
+		isListening = true;
 	}
-	
-		
+
+	$scope.stopListener = function() {
+		isListening = false;
+	}
+
+	$scope.startAnalyzer = function() {
+		addLogItem("Start Analyzer",2);
+	}
+
+	$scope.stopAnalyzer = function() {
+		addLogItem("Stop Analyzer",2);
+	}
+
+	$scope.viewAnalyzerResults = function() {
+		addLogItem("View Analyzer Results",2);
+	}
 
 }]);
