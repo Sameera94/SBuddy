@@ -5,7 +5,6 @@ var async     = require("async");
 var exec 	  = require('child_process').exec;
 var nodemiral = require('nodemiral');
 var mysql 	  = require('mysql');
-
 //Configurations
 
 
@@ -116,7 +115,7 @@ router.post('/downloadFolder', function (req, res, next) {
 router.get('/getQueryData',function(req,res){
 	pool.getConnection(function (err, connection) {
 
-		var sql = mysql.format("select * from general_log WHERE command_type = 'Query' order by event_time DESC");
+		var sql = mysql.format("SELECT * from general_log WHERE command_type = 'Query' AND argument NOT LIKE '%general_log%' AND argument NOT LIKE 'SET %' AND argument NOT LIKE 'SET CHARACTER%' AND argument NOT LIKE 'SHOW TABLE STATUS FROM%' AND argument NOT LIKE '%SELECT CURRENT_USER()%' AND argument NOT LIKE 'SELECT `PRIVILEGE_TYPE` FROM%' order by event_time DESC LIMIT 25");
 
 		connection.query(sql, function (error, results, fields) {
 			connection.release();

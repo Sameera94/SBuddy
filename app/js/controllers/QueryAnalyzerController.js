@@ -12,11 +12,6 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 		});
 	}
 
-
-	// setInterval(5000,function(data){
- //  		getAllExecutedQueryData()
- //  	});
-
 	var pooling = function() {
 		$http.get('/connection/getQueryData', {
 		}).success(function (data) {
@@ -29,6 +24,5 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 	};
 
 	pooling();
-
 
 }]);
