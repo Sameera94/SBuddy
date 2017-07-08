@@ -1,0 +1,22 @@
+<section class="content-header">
+	<h1>
+		Books List
+	</h1>
+</section>
+
+<section class="content">
+  <div class="row">
+      <div class="col-md-3 col-sm-6 col-xs-12" ng-repeat="book in booksList">
+          <div class="info-box">
+            <span class="info-box-icon bg-aqua"><i class="fa fa-book"></i></span>
+            <div class="info-box-content">
+              <span ><B>{{book.name}}</B></span><br/>
+              <span style="color:gray">{{book.author}}</span>
+			  
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+  </div>
+</section>

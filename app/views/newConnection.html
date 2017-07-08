@@ -1,0 +1,87 @@
+
+<section class="content">
+
+	<div class="row">
+		<div class="col-md-4">
+			<div class="box box-primary">
+				<div class="box-header with-border" style="padding-left:15px">
+					<h3 class="box-title">Connection Details</h3>
+				</div>
+				<form role="form">
+					<div class="box-body" style="padding-left:15px;padding-right:15px">
+						<div class="form-group">
+							<label for="exampleInputEmail1">IP Address/Domain</label>
+							<input type="text" ng-model="ip" class="form-control" id="ip" placeholder="Enter IP/Domain">
+						</div>
+						<div class="form-group">
+							<label for="exampleInputEmail1">Username</label>
+							<input type="text" ng-model="username" class="form-control" id="username" placeholder="Enter Username">
+						</div>
+						<div class="form-group">
+							<label for="exampleInputEmail1">Password</label>
+							<input type="password" ng-model="password" class="form-control" id="password" placeholder="Enter Password">
+						</div>
+					</div>
+					<div class="box-footer" style="padding-left:15px;">
+						<button ng-click='onClickConnectToServer()' class="btn btn-primary">Connect</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="col-md-8">
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<h3 class="box-title">File System</h3>
+					<div class="box-tools pull-right">
+						<button ng-click='refreshFileList()' type="button" class="btn btn-box-tool"><i class="fa fa-refresh"></i></button>
+					</div>
+				</div>
+				<br/>
+				<div style="height:203px;overflow: scroll">
+					<div
+						data-angular-treeview="true"
+						data-tree-id="abc"
+						data-tree-model="treedata"
+						data-node-id="id"
+						data-node-label="label"
+						data-node-path="path"
+						data-node-children="children">
+					</div>
+				</div>
+				<br/>
+				<div class="box-footer">
+					<div class="row">
+						<div class="col-md-10">
+							<span style="margin:0 auto"><b>Selected Folder</b>:&nbsp;{{abc.currentNode.path}}</span>
+						</div>
+						<div class="col-md-2">
+							<button ng-click='downloadFolder(abc.currentNode.path)' class="btn btn-primary">Download</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="box box-primary">
+				<div class="box-header with-border" style="padding-left:15px">
+					<h3 class="box-title">Results</h3>
+					<div class="box-tools pull-right">
+						<button ng-click='addLog()' type="button" class="btn btn-box-tool"><i class="fa fa-refresh"></i></button>
+					</div>
+				</div>
+				<div class="box-body" style="padding-left:15px;padding-right:15px;height:230px;overflow: scroll">
+					<p>
+						<span ng-repeat="log in logsArray">
+							<span ng-if="log.color == 0" style="color:red">{{log.time | date:'yyyy-MM-dd HH:mm:ss'}}&nbsp;-&nbsp;{{log.data}}</span>
+							<span ng-if="log.color == 1" style="color:green">{{log.time | date:'yyyy-MM-dd HH:mm:ss'}}&nbsp;-&nbsp;{{log.data}}</span>
+							<span ng-if="log.color == 2" style="color:black">{{log.time | date:'yyyy-MM-dd HH:mm:ss'}}&nbsp;-&nbsp;{{log.data}}</span>
+							<br/>
+						</span>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

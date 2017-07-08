@@ -1,0 +1,85 @@
+<section class="content-header">
+	<h1>
+		Borrow / Return Books
+		<small>Version 1.0</small>
+	</h1>
+</section>
+
+<section class="content">
+	<div class="row">
+		<!-- left column -->
+		<div class="col-md-12">
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<h3 class="box-title">Borrow Books</h3>
+				</div>
+				<form role="form">
+					<div class="box-body">
+						<!--<div class="form-group">
+							<label for="exampleInputEmail1">Book ID</label>
+							<input type="text" ng-model="data.book" class="form-control" id="book" placeholder="Enter Book ID">
+							<select></select>
+						</div>-->
+						 <!-- /.form-group -->
+						<div class="form-group">
+							<label>Book Name</label>
+							<select class="form-control select2" style="width: 100%;" ng-model="data.borrowBook">
+								<option value="false">Please select</option>
+								<option value="{{ book.name }}" ng-repeat="book in booksList">{{ book.name  }}</option>
+							</select>
+						</div>
+
+						<div class="form-group">
+							<label>User ID</label>
+							<select class="form-control select2" style="width: 100%;" ng-model="data.userID">
+								<option value="false">Please select</option>
+								<option value="{{ user.fname }} {{ user.lname }}" ng-repeat="user in usersList">{{ user.fname  }} {{ user.lname }}</option>
+							</select>
+						</div>
+					</div>
+					<div class="box-footer">
+						<button ng-click='borrowBook()' class="btn btn-primary">Borrow</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="box box-info">
+		<div class="box-header with-border">
+			<h3 class="box-title">Borrow Books Details</h3>
+
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+				<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+			</div>
+		</div>
+		<!-- /.box-header -->
+		<div class="box-body">
+			<div class="table-responsive">
+				<table class="table no-margin">
+					<thead>
+						<tr>
+							<th>Book Name</th>
+							<th>User Name</th>
+							<th>Date</th>
+							<th>Return</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="borrow in borrowList">
+							
+							<td>{{ borrow.book }}</td>
+							<td>{{ borrow.user }}</td>
+							<td>{{ borrow.created }}</td>
+							<td><span class="label label-info">Return</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<!-- /.table-responsive -->
+		</div>
+	</div>
+	
+</section>
