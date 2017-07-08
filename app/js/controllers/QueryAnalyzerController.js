@@ -24,6 +24,12 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 		})
 	}
 
+	var addLogItemWithTimeout = function(data,status,time) {
+		$timeout(function() {
+            addLogItem(data,status);
+        }, time);
+	}
+
 	var pooling = function() {
 		if(isListening){
 			$http.get('/connection/getQueryData', {
@@ -39,16 +45,30 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 	pooling();
 
 	$scope.startListener = function() {
-		addLogItem("Start listener",2);
+		addLogItem("Start listening...",2);
 		isListening = true;
 	}
 
 	$scope.stopListener = function() {
+		addLogItem("Stop listener...",2);
 		isListening = false;
 	}
 
 	$scope.startAnalyzer = function() {
-		addLogItem("Start Analyzer",2);
+		addLogItem("Start Analyzing...",2);
+		$http.get('/sql/startAnalyzer', {
+		}).success(function (data) {
+			addLogItemWithTimeout("Processing queries...",1,2000);
+			addLogItemWithTimeout("Remove duplicate records...",1,4000);
+			addLogItemWithTimeout("Sumarizing final records...",1,6000);
+			addLogItemWithTimeout("Executing queries & save results...",1,9000);
+			addLogItemWithTimeout("Processing final records...",1, 11000)
+			addLogItemWithTimeout("Query Analyzing completed...",1,12000);
+		}).error(function (error) {
+			console.log(error);
+			addLogItemWithTimeout("Processing queries...",1,2000);
+			addLogItemWithTimeout("Query Analyzing failed...",0,4000);
+		});
 	}
 
 	$scope.stopAnalyzer = function() {

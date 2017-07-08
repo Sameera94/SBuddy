@@ -5,7 +5,6 @@ var async     = require("async");
 
 var pool2 = mysql.createPool({
 	host: 'localhost',
-	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
 	user: 'root',
 	password: 'root',
 	database: 'seo_buddy'
@@ -13,10 +12,16 @@ var pool2 = mysql.createPool({
 
 var pool1 = mysql.createPool({
 	host: 'localhost',
-	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
 	user: 'root',
 	password: 'root',
-	database: 'origin'
+	database: 'mysql'
+});
+
+var pool3 = mysql.createPool({
+	host: 'localhost',
+	user: 'root',
+	password: 'root',
+	database: 'node_db'
 });
 
 var clearDynamicQueriesTable = function(callback) {
@@ -51,7 +56,7 @@ var clearQuniqueQueriesTable = function(callback) {
 var getAllQueriesFromGenaralSqlTable = function(callback) {
 	pool1.getConnection(function (err, connection) {
 
-		var sql = mysql.format("SELECT DISTINCT(argument) from general_log WHERE command_type = 'Query' AND argument LIKE 'Select%' order by event_time DESC");
+		var sql = mysql.format("SELECT DISTINCT(argument) from general_log WHERE command_type = 'Query' AND argument LIKE 'Select%' AND argument NOT LIKE '%tracking_active FROM%' AND argument NOT LIKE '%MAX(version)%' AND argument NOT LIKE '%phpmyadmin%' AND argument NOT LIKE '%information_schema%' AND argument NOT LIKE '%seo_buddy%' AND argument NOT LIKE '%general_log%' AND argument NOT LIKE 'SELECT @@%' AND argument NOT LIKE '%executeMysqlQuery%' order by event_time DESC");
 		//"SELECT DISTINCT(argument) from general_log WHERE command_type = 'Query' AND argument NOT LIKE '%general_log%' AND argument NOT LIKE 'SET %' AND argument NOT LIKE 'SET CHARACTER%' AND argument NOT LIKE 'SHOW TABLE STATUS FROM%' AND argument NOT LIKE '%SELECT CURRENT_USER()%' AND argument NOT LIKE 'SELECT `PRIVILEGE_TYPE` FROM%' order by event_time DESC"
 
 		connection.query(sql, function (error, results, fields) {
@@ -97,7 +102,7 @@ var inserRecordIntoDynamicQueryTable = function(data,callback){
 }
 
 var executeMysqlQuery = function(query,callback){
-	pool1.getConnection(function (err, connection) {
+	pool3.getConnection(function (err, connection) {
 
 		connection.query(query, function (error, results, fields) {
 			connection.release();
@@ -128,7 +133,7 @@ var inserRecordIntoUniqueQueryTable = function(query,result,callback){
 }
 
 
-router.get('/test', function (req, res, next) {
+router.get('/startAnalyzer', function (req, res, next) {
 
 	// Delete all records in dynamic_queries table
 	clearDynamicQueriesTable(function(){
