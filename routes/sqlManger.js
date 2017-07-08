@@ -5,6 +5,7 @@ var async     = require("async");
 
 var pool2 = mysql.createPool({
 	host: 'localhost',
+	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
 	user: 'root',
 	password: 'root',
 	database: 'seo_buddy'
@@ -12,6 +13,7 @@ var pool2 = mysql.createPool({
 
 var pool1 = mysql.createPool({
 	host: 'localhost',
+	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
 	user: 'root',
 	password: 'root',
 	database: 'mysql'
@@ -19,9 +21,18 @@ var pool1 = mysql.createPool({
 
 var pool3 = mysql.createPool({
 	host: 'localhost',
+	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
 	user: 'root',
 	password: 'root',
 	database: 'node_db'
+});
+
+var pool4 = mysql.createPool({
+	host: 'localhost',
+	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
+	user: 'root',
+	password: 'root',
+	database: 'information_schema'
 });
 
 var clearDynamicQueriesTable = function(callback) {
@@ -73,6 +84,21 @@ var getAllQueriesFromDynamicTable = function(callback) {
 	pool2.getConnection(function (err, connection) {
 
 		var sql = mysql.format("SELECT * FROM dynamic_queries");
+		
+		connection.query(sql, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log(error)
+			}
+			callback(results)
+		});
+	});
+}
+
+var getAllQueriesFromUniqueTable = function(callback) {
+	pool2.getConnection(function (err, connection) {
+
+		var sql = mysql.format("SELECT * FROM unique_queries");
 		
 		connection.query(sql, function (error, results, fields) {
 			connection.release();
@@ -180,70 +206,189 @@ router.get('/startAnalyzer', function (req, res, next) {
 
 
 
+var extractTableNames = function(resultsArray,tables,callback) {
+	var selectedTables = []
+	async.forEach(resultsArray, function (result, callback) {
+		var query = result.query;
+		async.forEach(tables, function (table, cb) {
+			if(query.indexOf(table.table_name) > -1) {
+				selectedTables.push(table.table_name);
+				cb();
+			} else {
+				cb();
+			}
+		}, function (err) {
+			callback();
+		});
+	}, function (err) {
+		callback(selectedTables);
+	});
+}
 
-
-
-
-
-
-
-
-var insertQuery = function(query,time,result,cb) {
-	pool.getConnection(function (err, connection) {
-
-		var values = {
-			query	: query,
-			time	: time,
-			result	: result
-		};
-
-		connection.query('INSERT INTO dynamic_queries SET ?', values, function (error, results, fields) {
+var getAllTableNamesFromDB = function(callback){
+	pool4.getConnection(function (err, connection) {
+		connection.query("SELECT table_name FROM tables WHERE table_schema=?",["node_db"], function (error, results, fields) {
 			connection.release();
 			if (error) {
-				res.send(error);
+				console.log("Error occured getting result...")
 			}
-			console.log("new record added to dynamic_queries")
-			cb();
+			callback(results);
 		});
 	});
 }
 
-router.post('/insertNewQueryArray', function (req, res, next) {
-	pool.getConnection(function (err, connection) {
-		async.forEach(req.body.data, function (query, callback) {
+var getUniqueArray = function(array, callback){
+    let s = new Set(array);
+    let it = s.values();
+    
+	callback( Array.from(it));
+}
 
-			// insertQuery(query.argument, query.event_time, "", function(){
-			// 	callback();
-			// })
-			
 
-				var values = {
-					query	: query.argument,
-					time	: query.event_time,
-					result	: ""
-				};
+var findString = function(searchingString, callback) {
+	var resultsArray = []
+	getAllTableNamesFromDB(function(tables){
+		getAllQueriesFromUniqueTable(function(records){
+			async.forEach(records, function (record, callback) {
 
-				connection.query('INSERT INTO dynamic_queries SET ?', values, function (error, results, fields) {
-					
-					if (error) {
-						res.send(error);
-					}
-					console.log("new record added to dynamic_queries")
+				var recordData = record.result;
+				var searchString = searchingString;
+				
+				if(recordData.indexOf(searchString) > -1) {
+					resultsArray.push(record);
 					callback();
+				} else {
+					callback();
+				}
+			}, function (err) {
+				extractTableNames(resultsArray,tables,function(selectedTables){
+					getUniqueArray(selectedTables, function(result){
+						callback(result);
+					})
 				});
-			
-
-		}, function (err) {
-			connection.release();
-			res.send("Done")
+			});
 		});
+	})
+}
+
+/*
+	This route expects search string as "req.body.searchString"
+	Returns True or False
+*/	
+router.post('/isReplacePosible', function (req, res, next) {
+	findString(req.body.searchString, function(arr){
+		if(arr.length > 0){
+			res.send("true")
+		} else {
+			res.send("false")
+		}
 	});
-	
 });
 
+var replaceStringInATable = function(oldString, newString, columns, tbl, callback) {
+	var updateRecords = []
+	pool3.getConnection(function (err, connection) {
+		connection.query("SELECT * FROM ??",[tbl], function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log("Error occured getting resultssss...")
+			}
 
+			async.forEach(results, function (record, callback) {
+				
+				async.forEach(columns, function (column, cb) {
+					if(record[column] == oldString){
+						updateRecords.push({
+							"id": record[columns[0]],
+							"index_column": columns[0],
+							"column": column,
+							"value": newString,
+							"table": tbl
+						})
+					}
+					cb();
+				}, function (err) {
+					callback()
+				});
+			}, function (err) {
+				callback(updateRecords)
+			});
+		});
+	});
+}
 
+var getColumsFromTheTable = function(table,callback) {
+	var colums = []
+	pool3.getConnection(function (err, connection) {
+		connection.query("SHOW COLUMNS FROM ??",[table], function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log("Error occured getting result...")
+			}
+			
+			async.forEach(results, function (record, callback) {
+				colums.push(record.Field);
+				callback();
+			}, function (err) {
+				callback(colums)
+			});
+		});
+	});
+}
 
+var replaceDataTable = function(array, callback){
+	async.forEach(array, function (rec, callback) {
+		var id = rec["id"]
+		var column = rec["column"]
+		var table = rec["table"]
+		var value = rec["value"]
+		var index_column = rec["index_column"]
+
+		pool3.getConnection(function (err, connection) {
+		 	connection.query("UPDATE ?? SET ?? = ? WHERE ?? = ?", [table,column,value, index_column,id], function (error, results, fields) {
+				if(error){
+					console.log(error);
+				}
+				callback();
+		 	});
+		});
+	}, function (err) {
+		callback("done")
+	});
+}
+
+router.post('/replaceString', function (req, res, next) {
+	var oldString = req.body.searchString;
+	var newString = req.body.newString;	
+	
+	
+	findString(req.body.searchString, function(arr){
+		if(arr.length > 0){
+			if(arr.length == 1){
+				getColumsFromTheTable(arr[0],function(columns){
+					replaceStringInATable(oldString,newString,columns,arr[0],function(result){
+						console.log(result)
+						replaceDataTable(result,function(result){
+							res.send(result)
+						});
+					})
+				})
+			} else {
+				res.send("Failed, There more than one tablles!");
+			}
+		} else {
+			res.send("false")
+		}
+	});
+	
+
+	//replaceStringInATable(oldString, newString, ["id","name","age"], "student", function(r){
+	// 	replaceDataTable(r,function(x){
+	// 		res.send(x)
+	// 	});
+	// })
+
+});
 
 
 
