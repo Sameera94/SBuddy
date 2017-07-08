@@ -3,14 +3,185 @@ var router    = express.Router();
 var mysql 	  = require('mysql');
 var async     = require("async");
 
-var pool = mysql.createPool({
+var pool2 = mysql.createPool({
 	host: 'localhost',
+	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
 	user: 'root',
 	password: 'root',
 	database: 'seo_buddy'
 });
 
-var allQueryArray = []
+var pool1 = mysql.createPool({
+	host: 'localhost',
+	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
+	user: 'root',
+	password: 'root',
+	database: 'origin'
+});
+
+var clearDynamicQueriesTable = function(callback) {
+	pool2.getConnection(function (err, connection) {
+		var sql = mysql.format("DELETE FROM dynamic_queries");
+
+		connection.query(sql, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log(error)
+			}
+			callback()
+		});
+	});
+}
+
+var clearQuniqueQueriesTable = function(callback) {
+	pool2.getConnection(function (err, connection) {
+		var sql = mysql.format("DELETE FROM unique_queries");
+
+		connection.query(sql, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log(error)
+			}
+			callback()
+		});
+	});
+}
+
+//This will return only select queries
+var getAllQueriesFromGenaralSqlTable = function(callback) {
+	pool1.getConnection(function (err, connection) {
+
+		var sql = mysql.format("SELECT DISTINCT(argument) from general_log WHERE command_type = 'Query' AND argument LIKE 'Select%' order by event_time DESC");
+		//"SELECT DISTINCT(argument) from general_log WHERE command_type = 'Query' AND argument NOT LIKE '%general_log%' AND argument NOT LIKE 'SET %' AND argument NOT LIKE 'SET CHARACTER%' AND argument NOT LIKE 'SHOW TABLE STATUS FROM%' AND argument NOT LIKE '%SELECT CURRENT_USER()%' AND argument NOT LIKE 'SELECT `PRIVILEGE_TYPE` FROM%' order by event_time DESC"
+
+		connection.query(sql, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log(error);
+			}
+			callback(results)
+		});
+	});
+}
+
+var getAllQueriesFromDynamicTable = function(callback) {
+	pool2.getConnection(function (err, connection) {
+
+		var sql = mysql.format("SELECT * FROM dynamic_queries");
+		
+		connection.query(sql, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log(error)
+			}
+			callback(results)
+		});
+	});
+}
+
+var inserRecordIntoDynamicQueryTable = function(data,callback){
+	pool2.getConnection(function (err, connection) {
+
+		var values = {
+			query	: data
+		};
+
+		connection.query('INSERT INTO dynamic_queries SET ?', values, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log(error)
+			}
+			callback();
+		});
+	});
+}
+
+var executeMysqlQuery = function(query,callback){
+	pool1.getConnection(function (err, connection) {
+
+		connection.query(query, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log("Error occured when executing query...");
+			}
+			callback(query,results);
+		});
+	});
+}
+
+var inserRecordIntoUniqueQueryTable = function(query,result,callback){
+	pool2.getConnection(function (err, connection) {
+
+		var values = {
+			query	: query,
+			result  : JSON.stringify(result)
+		};
+
+		connection.query('INSERT INTO unique_queries SET ?', values, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log("Error occured when inserting result...")
+			}
+			callback();
+		});
+	});
+}
+
+
+router.get('/test', function (req, res, next) {
+
+	// Delete all records in dynamic_queries table
+	clearDynamicQueriesTable(function(){
+		// Delete all records in unique_queries table
+		clearQuniqueQueriesTable(function(){
+			//get all records from genaral_sql_log
+			getAllQueriesFromGenaralSqlTable(function(queries){
+				// Insert into dynamic table
+				async.forEach(queries, function (record, callback) {
+					if (record.argument != null) {
+						inserRecordIntoDynamicQueryTable(record.argument, function(){
+							callback();
+						})
+					} else {
+						console.log("record is null")
+						callback();
+					}
+				}, function (err) {
+					if(err){
+						console.log(err)
+					}
+					// Get All Quesries in Dynamic tablle one by one
+					getAllQueriesFromDynamicTable(function(records){
+						async.forEach(records, function (record, callback) {
+							// Execute the query
+							
+							executeMysqlQuery(record.query,function(executedQuery, result){
+								// Insert Query and Result inot Unique table
+								inserRecordIntoUniqueQueryTable(executedQuery, result, function(){
+									callback();
+								})
+							})
+							
+							//callback();
+						}, function (err) {
+							res.send("All Done....")
+						});
+					})
+				});
+			});	
+		})
+	});
+});
+
+
+
+
+
+
+
+
+
+
 
 var insertQuery = function(query,time,result,cb) {
 	pool.getConnection(function (err, connection) {
