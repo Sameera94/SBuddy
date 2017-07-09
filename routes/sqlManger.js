@@ -234,10 +234,30 @@ var getAllTableNamesFromDB = function(callback){
 }
 
 var getUniqueArray = function(array, callback){
-    let s = new Set(array);
-    let it = s.values();
-    
-	callback( Array.from(it));
+
+    var uniqueNames = []
+
+    async.forEach(array, function (name, cb) {
+        var isAvailable = false
+        async.forEach(uniqueNames, function (uniqueName, callback) {
+            if (uniqueName == name ){
+                isAvailable = true
+                callback()
+            } else {
+                callback()
+            }
+        }, function (err) {
+            console.log(isAvailable)
+            if(isAvailable == false){
+                uniqueNames.push(name)
+                cb()
+            } else {
+                cb()
+            }
+        });
+    }, function (err) {
+        callback(uniqueNames);      
+    });
 }
 
 
