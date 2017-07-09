@@ -87,9 +87,52 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 		}).error(function (error) {
 			console.log(error);
 		});
-
-		
 	}
+
+	$scope.checkForReplacement = function() {
+		addLogItem("Checking for the replacement...",2);
+
+		$http.post('/sql/isReplacePosible', {
+			searchString: $scope.textString
+		}).success(
+			function (data) {
+				if(data == "true") {
+					addLogItem("Replaement is posibble...",1);
+				} else {
+					addLogItem("Replaement is not posibble...",0);
+				}	
+			}
+		).error(
+			function (error) {
+				console.log(error);
+				addLogItem("Error occured in endpoint-1",0);
+			}
+		);
+	}
+
+	$scope.doTheReplacement = function() {
+		addLogItem("Connecting replacement component...",2);
+
+		$http.post('/sql/replaceString', {
+			searchString : $scope.textString,
+			newString	 : $scope.updatedString
+		}).success(
+			function (data) {
+				if(data == "true") {
+					addLogItem("Successfully replced!",1);
+				} else {
+					addLogItem("Replaement failed",0);
+				}	
+			}
+		).error(
+			function (error) {
+				console.log(error);
+				addLogItem("Error occured in endpoint-2",0);
+			}
+		);
+	}
+	
+	
 	
 
 }]);
