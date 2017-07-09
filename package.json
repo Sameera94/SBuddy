@@ -36,7 +36,9 @@
     "remote-exec": "0.0.3",
     "website-scraper": "^2.4.0",
     "bluebird": "~3.5.0",
-    "mysql": "~2.13.0"
+    "mysql": "~2.13.0",
+    "easy-ftp": "~0.3.34",
+    "ftp-simple": "~0.1.22"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

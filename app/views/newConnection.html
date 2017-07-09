@@ -37,7 +37,7 @@
 					</div>
 				</div>
 				<br/>
-				<div style="height:203px;overflow: scroll">
+				<div style="height:203px;overflow-y: scroll">
 					<div
 						data-angular-treeview="true"
 						data-tree-id="abc"
@@ -50,14 +50,14 @@
 				</div>
 				<br/>
 				<div class="box-footer">
-					<div class="row">
-						<div class="col-md-10">
-							<span style="margin:0 auto"><b>Selected Folder</b>:&nbsp;{{abc.currentNode.path}}</span>
-						</div>
+					<!-- <div class="row">
+						<div class="col-md-10"> -->
+							<span class="pull-left" style="margin:0 auto"><b>Selected Folder</b>:&nbsp;{{abc.currentNode.path}}</span>
+<!-- 						</div>
 						<div class="col-md-2">
-							<button ng-click='downloadFolder(abc.currentNode.path)' class="btn btn-primary">Download</button>
-						</div>
-					</div>
+ -->							<button class="pull-right btn btn-primary" ng-click='downloadFolder(abc.currentNode.path)'>Download</button>
+	<!-- 					</div>
+					</div> -->
 				</div>
 			</div>
 		</div>
@@ -71,7 +71,7 @@
 						<button ng-click='addLog()' type="button" class="btn btn-box-tool"><i class="fa fa-refresh"></i></button>
 					</div>
 				</div>
-				<div class="box-body" style="padding-left:15px;padding-right:15px;height:230px;overflow: scroll">
+				<div class="box-body" style="padding-left:15px;padding-right:15px;height:230px;overflow-y: scroll">
 					<p>
 						<span ng-repeat="log in logsArray">
 							<span ng-if="log.color == 0" style="color:red">{{log.time | date:'yyyy-MM-dd HH:mm:ss'}}&nbsp;-&nbsp;{{log.data}}</span>

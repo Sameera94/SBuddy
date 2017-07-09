@@ -44,5 +44,5 @@ app.get('/', function (req, res) {
         Server
 *************************/
 app.listen(8090);
-console.log("Angular AdminTemplate running on port 8090");
+console.log("SEO Buddy running on port 8090");
 module.exports = app;

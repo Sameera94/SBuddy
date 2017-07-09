@@ -5,6 +5,9 @@ var async     = require("async");
 var exec 	  = require('child_process').exec;
 var nodemiral = require('nodemiral');
 var mysql 	  = require('mysql');
+// var FTP 	  = require('ftp-simple');
+
+
 //Configurations
 
 
@@ -14,6 +17,22 @@ var mysql 	  = require('mysql');
 // 	user: "sameera",
 // 	pass: "sameera"
 // });
+
+
+// var easyftp = new EasyFtp();
+// easyftp.connect(config);	
+
+// var config = {
+//     host: '10.52.209.6',
+//     port: 21,
+//     username: 'sysadmin',
+//     password: '3college!'
+// };
+
+
+// var simpleftp = new FTP(config);
+
+
 
 var pool = mysql.createPool({
 	host: 'localhost',
@@ -27,7 +46,7 @@ var session = nodemiral.session('10.52.209.6', {
 	password: '3college!'
 });
 
-var baseUrl = "/home/sysadmin/SFC/NodeServerAccount";
+var baseUrl = "/home/sysadmin";
 //var baseUrl = "/home/sameera/Desktop/SFCUpdatedDesktop/NodeServerAccount";
 
 var ftp = null;
@@ -90,24 +109,46 @@ router.post('/downloadFolder', function (req, res, next) {
 
 	var rawCommand  = 'zip -r ' + req.body.path+'.zip ' + req.body.path
 	var zipFilePath = req.body.path + ".zip"
-	var destinationPath = "/Users/vchans5/Documents/ResearchStuff/MainApp/downloads/web.zip"
+	var destinationPath = "/home/sameera/Desktop/Research/Downloads/BlogsWeb.zip"
+
 
 	//create zip file
 	session.execute(rawCommand, function(err, code, logs) {
 		
 		console.log(logs.stdout);
+		console.log("Going to download file: "+zipFilePath+ " and save to: "+destinationPath);
 
-		//download zip file
-		ftp.get(zipFilePath, destinationPath, function (err) {
-			if (err){
-				console.error('There was an error retrieving the file.');
-				res.send("failed");
-			} else {
-				console.log('File copied successfully!');
-				//TODO: Remove zip file from server
-				res.send("success");			
-			}
-		});
+
+        setTimeout(function() {
+
+        	console.log("Start downloading...")
+
+		    //download zip file
+		    /*
+			ftp.get(zipFilePath, destinationPath, function (err) {
+				if (err){
+					console.error('There was an error retrieving the file.');
+					res.send("failed");
+				} else {
+					console.log('File copied successfully!');
+					//TODO: Remove zip file from server
+					res.send("success");			
+				}
+			});
+			*/
+			//var cmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:/home/sysadmin/BlogsWeb.zip /home/sameera/Desktop/Research/Downloads/BlogsWeb.zip"
+
+		 	var newCmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:"+req.body.path+".zip /home/sameera/Desktop/Research/Downloads/web.zip" 
+
+
+			exec(newCmd, function (err, stdout, stderr) {
+		  		res.send("success");
+			});
+
+
+
+		}, 5000);
+		
 	});
 
 });
@@ -126,5 +167,17 @@ router.get('/getQueryData',function(req,res){
 		});
 	});
 });
+
+
+router.get('/easy',function(req,res){
+
+	var cmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:/home/sysadmin/BlogsWeb.zip /home/sameera/Desktop/Research/Downloads/BlogsWeb.zip"
+
+
+	exec(cmd, function (err, stdout, stderr) {
+  		res.send(stdout.toString('utf8'));
+	});
+
+})
 
 module.exports = router;
