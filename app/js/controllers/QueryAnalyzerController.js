@@ -4,6 +4,11 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 	var isListening = false;
 	$scope.logsArray = []
 
+	$scope.spinerOfAnalyzer = true;
+
+	$scope.spinerOfEndPointOne = true;
+	$scope.spinerOfEndPointTwo = true;
+
 	// var getAllExecutedQueryData = function () {
 	// 	$http.get('/connection/getQueryData', {
 	// 	}).success(function (data) {
@@ -45,6 +50,7 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 	pooling();
 
 	$scope.startListener = function() {
+
 		addLogItem("Start listening...",2);
 		isListening = true;
 	}
@@ -56,14 +62,22 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 
 	$scope.startAnalyzer = function() {
 		addLogItem("Start Analyzing...",2);
+		$scope.spinerOfAnalyzer = false;
+
 		$http.get('/sql/startAnalyzer', {
 		}).success(function (data) {
+
 			addLogItemWithTimeout("Processing queries...",1,2000);
 			addLogItemWithTimeout("Remove duplicate records...",1,4000);
 			addLogItemWithTimeout("Sumarizing final records...",1,6000);
 			addLogItemWithTimeout("Executing queries & save results...",1,9000);
 			addLogItemWithTimeout("Processing final records...",1, 11000)
 			addLogItemWithTimeout("Query Analyzing completed...",1,12000);
+
+			$timeout(function() {
+            	$scope.spinerOfAnalyzer = true;
+       		}, 12000);
+
 		}).error(function (error) {
 			console.log(error);
 			addLogItemWithTimeout("Processing queries...",1,2000);
@@ -73,6 +87,7 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 
 	$scope.stopAnalyzer = function() {
 		addLogItem("Stop Analyzer",2);
+		$scope.spinerOfAnalyzer = true;
 	}
 
 	$scope.viewAnalyzerResults = function() {
@@ -91,15 +106,23 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 
 	$scope.checkForReplacement = function() {
 		addLogItem("Checking for the replacement...",2);
+		$scope.spinerOfEndPointOne = false;
 
 		$http.post('/sql/isReplacePosible', {
 			searchString: $scope.textString
 		}).success(
 			function (data) {
 				if(data == "true") {
-					addLogItem("Replaement is posibble...",1);
+					$timeout(function() {
+		            	addLogItem("Replaement is posibble...",1);
+						$scope.spinerOfEndPointOne = true;
+		       		}, 3000);
+
 				} else {
-					addLogItem("Replaement is not posibble...",0);
+					$timeout(function() {
+		            	addLogItem("Replaement is not posibble...",0);
+						$scope.spinerOfEndPointOne = true;
+		       		}, 3000);
 				}	
 			}
 		).error(
@@ -112,6 +135,7 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 
 	$scope.doTheReplacement = function() {
 		addLogItem("Connecting replacement component...",2);
+		$scope.spinerOfEndPointTwo = false;
 
 		$http.post('/sql/replaceString', {
 			searchString : $scope.textString,
@@ -119,9 +143,15 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 		}).success(
 			function (data) {
 				if(data == "true") {
-					addLogItem("Successfully replced!",1);
+					$timeout(function() {
+		            	addLogItem("Successfully replced!",1);
+						$scope.spinerOfEndPointTwo = true;
+		       		}, 3000);
 				} else {
-					addLogItem("Replaement failed",0);
+					$timeout(function() {
+		            	addLogItem("Replaement failed",0);
+						$scope.spinerOfEndPointTwo = true;
+		       		}, 3000);
 				}	
 			}
 		).error(

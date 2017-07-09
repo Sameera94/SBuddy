@@ -22,10 +22,14 @@
 							<input type="password" ng-model="password" class="form-control" id="password" placeholder="Enter Password">
 						</div>
 					</div>
+					
 					<div class="box-footer" style="padding-left:15px;">
 						<button ng-click='onClickConnectToServer()' class="btn btn-primary">Connect</button>
 					</div>
 				</form>
+				<div class="overlay" ng-hide="spinerOfConnection">
+          			<i class="fa fa-refresh fa-spin"></i>
+        		</div>
 			</div>
 		</div>
 		<div class="col-md-8">
@@ -59,6 +63,9 @@
 	<!-- 					</div>
 					</div> -->
 				</div>
+				<div class="overlay" ng-hide="spinerOfFileSystem">
+              		<i class="fa fa-refresh fa-spin"></i>
+            	</div>
 			</div>
 		</div>
 	</div>
@@ -81,6 +88,9 @@
 						</span>
 					</p>
 				</div>
+				<!-- <div class="overlay">
+              		<i class="fa fa-refresh fa-spin"></i>
+            	</div> -->
 			</div>
 		</div>
 	</div>
