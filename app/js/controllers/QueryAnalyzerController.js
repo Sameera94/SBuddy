@@ -79,4 +79,17 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 		addLogItem("View Analyzer Results",2);
 	}
 
+	$scope.cleanQueryLog = function() {
+		addLogItem("Cleaning query logs...",2);
+		$http.get('/sql/cleanGenaralLogs', {
+		}).success(function (data) {
+			addLogItem("Query Logs cleaned",2);
+		}).error(function (error) {
+			console.log(error);
+		});
+
+		
+	}
+	
+
 }]);

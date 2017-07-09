@@ -407,5 +407,19 @@ router.post('/replaceString', function (req, res, next) {
 });
 
 
+router.get('/cleanGenaralLogs', function (req, res, next) {
+	pool1.getConnection(function (err, connection) {
+		var sql = mysql.format("DELETE FROM general_log");
+
+		connection.query(sql, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log(error)
+			}
+			res.send("done");
+		});
+	});
+});
+
 
 module.exports = router;
