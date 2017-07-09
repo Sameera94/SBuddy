@@ -18,9 +18,8 @@ var mysql 	  = require('mysql');
 var pool = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
-	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
 	password: 'root',
-	database: 'origin'
+	database: 'mysql'
 });
 
 var session = nodemiral.session('10.52.209.6', {
