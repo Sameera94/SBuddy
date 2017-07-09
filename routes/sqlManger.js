@@ -5,7 +5,6 @@ var async     = require("async");
 
 var pool2 = mysql.createPool({
 	host: 'localhost',
-	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
 	user: 'root',
 	password: 'root',
 	database: 'seo_buddy'
@@ -13,7 +12,6 @@ var pool2 = mysql.createPool({
 
 var pool1 = mysql.createPool({
 	host: 'localhost',
-	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
 	user: 'root',
 	password: 'root',
 	database: 'mysql'
@@ -21,7 +19,6 @@ var pool1 = mysql.createPool({
 
 var pool3 = mysql.createPool({
 	host: 'localhost',
-	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
 	user: 'root',
 	password: 'root',
 	database: 'node_db'
@@ -29,7 +26,6 @@ var pool3 = mysql.createPool({
 
 var pool4 = mysql.createPool({
 	host: 'localhost',
-	socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
 	user: 'root',
 	password: 'root',
 	database: 'information_schema'
