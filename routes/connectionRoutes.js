@@ -8,28 +8,8 @@ var mysql 	  = require('mysql');
 var jsonfile  = require('jsonfile')
 
 //Configurations
-
-// var ftp = new JSFtp({
-// 	host: "192.168.8.102",
-// 	port: 21,
-// 	user: "sameera",
-// 	pass: "sameera"
-// });
-
-// var easyftp = new EasyFtp();
-// easyftp.connect(config);	
-
-// var config = {
-//     host: '10.52.209.6',
-//     port: 21,
-//     username: 'sysadmin',
-//     password: '3college!'
-// };
-
-
-// var simpleftp = new FTP(config);
-
-
+var baseUrl = "/home/sysadmin";
+var ftp = null;
 
 var pool = mysql.createPool({
 	host: 'localhost',
@@ -43,12 +23,72 @@ var session = nodemiral.session('10.52.209.6', {
 	password: '3college!'
 });
 
-var baseUrl = "/home/sysadmin";
-var ftp = null;
+router.post('/getFilesHeirachyOfGivenDirectory', function (req, res, next) {
+	getFilesHeirachyOfGivenDirectory(req.body.path,function(results) {
+		res.send(results);
+	});
+})
+
+var getFilesHeirachyOfGivenDirectory = function (path,callback) {
+	ftp.ls(path, function (err, res) {
+		callback(res)
+	});
+}
+
+router.post('/setupConnection', function (req, res) {
+	ftp = new JSFtp({
+		host: req.body.ip,
+		port: 21,
+		user: req.body.username,
+		pass: req.body.password
+	});
+});
+
+router.post('/downloadFolder', function (req, res, next) {
+
+	var rawCommand  = 'zip -r ' + req.body.path+'.zip ' + req.body.path
+	var zipFilePath = req.body.path + ".zip"
+	var destinationPath = "/home/sameera/Desktop/Research/Downloads/BlogsWeb.zip"
+
+	//create zip file
+	session.execute(rawCommand, function(err, code, logs) {		
+		console.log(logs.stdout);
+		console.log("Going to download file: "+zipFilePath+ " and save to: "+destinationPath);
+
+        setTimeout(function() {
+        	console.log("Start downloading...")
+
+		    //download zip file
+		 	var newCmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:"+req.body.path+".zip /home/sameera/Desktop/Research/Downloads/web.zip"
+			exec(newCmd, function (err, stdout, stderr) {
+		  		res.send("success");
+			});
+
+		}, 5000);
+	});
+});
+
+router.get('/getQueryData',function(req,res){
+	pool.getConnection(function (err, connection) {
+
+		var sql = mysql.format("SELECT * from general_log WHERE command_type = 'Query' AND argument NOT LIKE '%general_log%' AND argument NOT LIKE 'SET %' AND argument NOT LIKE 'SET CHARACTER%' AND argument NOT LIKE 'SHOW TABLE STATUS FROM%' AND argument NOT LIKE '%SELECT CURRENT_USER()%' AND argument NOT LIKE 'SELECT `PRIVILEGE_TYPE` FROM%' order by event_time DESC LIMIT 25");
+
+		connection.query(sql, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				res.send(error);
+			}
+			res.send(results);
+		});
+	});
+});
+
+module.exports = router;
 
 
-router.get('/testtest', function (req, res, next) {
-	
+/*********  Important file contents  *********/
+
+/*
 	// Upload SEO_Proxy
 	exec("sshpass -p 3college! scp /Users/vchans5/Desktop/07-13/SBuddy/SEO_Proxy.zip sysadmin@10.52.209.6:/home/sysadmin", function (err, stdout, stderr) {
 		console.log("\n* * * * * Uploading SEO_Proxy * * * * *")
@@ -98,9 +138,7 @@ router.get('/testtest', function (req, res, next) {
 			});
 		});
 	});
-	
-	/*
-
+======================================================================================================================================
 	//This is tested
 	exec("node /Users/vchans5/Desktop/07-13/SBuddy/SEO_Proxy/index.js", function (err, stdout, stderr) {
 		
@@ -113,7 +151,6 @@ router.get('/testtest', function (req, res, next) {
 		});
 	});
 
-
 	session.execute("sshpass -p 3college! scp /Users/vchans5/Desktop/07-13/SBuddy/SEO_Proxy.zip sysadmin@10.52.209.6:/home/sysadmin", function(err, code, logs) {
 		console.log("\n* * * * * Uploading SEO_Proxy * * * * *")
 		console.log("stdout: "+logs.stdout);
@@ -121,205 +158,118 @@ router.get('/testtest', function (req, res, next) {
 		if(err){
 			console.log(err)
 		}
-	*/
-});
 
-
-
-
-
-
-router.post('/getFilesHeirachyOfGivenDirectory', function (req, res, next) {
-
-	getFilesHeirachyOfGivenDirectory(req.body.path,function(results) {
-		res.send(results);
 	});
-})
+======================================================================================================================================
+	async.forEach(res, function (parent, callback) {
 
-var getFilesHeirachyOfGivenDirectory = function (path,callback) {
-	
-	var files = [];
-	var index = 0;
+		console.log("----------------------------------")
+		console.log(parent)
+		console.log("----------------------------------")
 
-	ftp.ls(path, function (err, res) {
-		
-		callback(res)
-		/*
-		async.forEach(res, function (parent, callback) {
-
-			console.log("----------------------------------")
-			console.log(parent)
-			console.log("----------------------------------")
-
-			ftp.ls(baseUrl + "/" + parent.name, function (err, res) {
-				if(res.length > 1){
-					files.push({
-						label: parent.name,
-						id: "role3",
-						path: baseUrl + "/" + parent.name,
-						children: [
-							{ label: "test", id: "role121", children: [] }
-						]
-					});
-					callback();
-				} else {
-					files.push({
-						label: parent.name,
-						id: "role3",
-						path: baseUrl + "/" + parent.name,
-						children: []
-					});
-					callback();
-				}
-			});
-
-			// ftp.ls(baseUrl + "/" + parent.name, function (err, res) {
-
-			// 	async.forEach(res, function (child, cb) {
-			// 		if (child.name != parent.name) {
-			// 			files[index].children.push({ label: child.name, id: "role121", children: [] })
-			// 			cb();
-			// 		} else {
-			// 			cb();
-			// 		}
-			// 	}, function (err) {
-			// 		callback();
-			// 		index = index + 1;
-			// 	});
-			// });
-
-
-		}, function (err) {
-			callback(files)
-		});
-		*/
-	});
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-var getFileArray = function (callback) {
-
-	var files = [];
-	var index = 0;
-
-	ftp.ls(baseUrl, function (err, res) {
-		async.forEach(res, function (parent, callback) {
-
-			files.push({
-				label: parent.name,
-				id: "role3",
-				path: baseUrl + "/" + parent.name,
-				children: []
-			});
-
-			ftp.ls(baseUrl + "/" + parent.name, function (err, res) {
-
-				async.forEach(res, function (child, cb) {
-					if (child.name != parent.name) {
-						files[index].children.push({ label: child.name, id: "role121", children: [] })
-						cb();
-					} else {
-						cb();
-					}
-				}, function (err) {
-					callback();
-					index = index + 1;
+		ftp.ls(baseUrl + "/" + parent.name, function (err, res) {
+			if(res.length > 1){
+				files.push({
+					label: parent.name,
+					id: "role3",
+					path: baseUrl + "/" + parent.name,
+					children: [
+						{ label: "test", id: "role121", children: [] }
+					]
 				});
-			});
-		}, function (err) {
-			callback(files)
-		});
-	});
-}
-
-router.post('/setupConnection', function (req, res) {
-	
-	ftp = new JSFtp({
-		host: req.body.ip,
-		port: 21,
-		user: req.body.username,
-		pass: req.body.password
-	});
-});
-
-router.get('/getTreeStructureFromRemoteServer', function (req, res) {
-	getFileArray(function (results) {
-		res.send(results);
-	});
-});
-
-router.post('/downloadFolder', function (req, res, next) {
-
-	var rawCommand  = 'zip -r ' + req.body.path+'.zip ' + req.body.path
-	var zipFilePath = req.body.path + ".zip"
-	var destinationPath = "/home/sameera/Desktop/Research/Downloads/BlogsWeb.zip"
-
-	//create zip file
-	session.execute(rawCommand, function(err, code, logs) {		
-		console.log(logs.stdout);
-		console.log("Going to download file: "+zipFilePath+ " and save to: "+destinationPath);
-
-        setTimeout(function() {
-        	console.log("Start downloading...")
-		    //download zip file
-		    /*
-			ftp.get(zipFilePath, destinationPath, function (err) {
-				if (err){
-					console.error('There was an error retrieving the file.');
-					res.send("failed");
-				} else {
-					console.log('File copied successfully!');
-					//TODO: Remove zip file from server
-					res.send("success");			
-				}
-			});
-			*/
-			//var cmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:/home/sysadmin/BlogsWeb.zip /home/sameera/Desktop/Research/Downloads/BlogsWeb.zip"
-
-		 	var newCmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:"+req.body.path+".zip /home/sameera/Desktop/Research/Downloads/web.zip"
-
-			exec(newCmd, function (err, stdout, stderr) {
-		  		res.send("success");
-			});
-
-		}, 5000);
-	});
-});
-
-router.get('/getQueryData',function(req,res){
-	pool.getConnection(function (err, connection) {
-
-		var sql = mysql.format("SELECT * from general_log WHERE command_type = 'Query' AND argument NOT LIKE '%general_log%' AND argument NOT LIKE 'SET %' AND argument NOT LIKE 'SET CHARACTER%' AND argument NOT LIKE 'SHOW TABLE STATUS FROM%' AND argument NOT LIKE '%SELECT CURRENT_USER()%' AND argument NOT LIKE 'SELECT `PRIVILEGE_TYPE` FROM%' order by event_time DESC LIMIT 25");
-
-		connection.query(sql, function (error, results, fields) {
-			connection.release();
-			if (error) {
-				res.send(error);
+				callback();
+			} else {
+				files.push({
+					label: parent.name,
+					id: "role3",
+					path: baseUrl + "/" + parent.name,
+					children: []
+				});
+				callback();
 			}
+		});
+
+		// ftp.ls(baseUrl + "/" + parent.name, function (err, res) {
+
+		// 	async.forEach(res, function (child, cb) {
+		// 		if (child.name != parent.name) {
+		// 			files[index].children.push({ label: child.name, id: "role121", children: [] })
+		// 			cb();
+		// 		} else {
+		// 			cb();
+		// 		}
+		// 	}, function (err) {
+		// 		callback();
+		// 		index = index + 1;
+		// 	});
+		// });
+
+
+	}, function (err) {
+		callback(files)
+	});
+======================================================================================================================================
+	var getFileArray = function (callback) {
+
+		var files = [];
+		var index = 0;
+
+		ftp.ls(baseUrl, function (err, res) {
+			async.forEach(res, function (parent, callback) {
+
+				files.push({
+					label: parent.name,
+					id: "role3",
+					path: baseUrl + "/" + parent.name,
+					children: []
+				});
+
+				ftp.ls(baseUrl + "/" + parent.name, function (err, res) {
+
+					async.forEach(res, function (child, cb) {
+						if (child.name != parent.name) {
+							files[index].children.push({ label: child.name, id: "role121", children: [] })
+							cb();
+						} else {
+							cb();
+						}
+					}, function (err) {
+						callback();
+						index = index + 1;
+					});
+				});
+			}, function (err) {
+				callback(files)
+			});
+		});
+	}
+======================================================================================================================================
+	router.get('/getTreeStructureFromRemoteServer', function (req, res) {
+		getFileArray(function (results) {
 			res.send(results);
 		});
 	});
-});
+======================================================================================================================================
+	router.get('/easy',function(req,res){
 
+		var cmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:/home/sysadmin/BlogsWeb.zip /home/sameera/Desktop/Research/Downloads/BlogsWeb.zip"
 
-router.get('/easy',function(req,res){
-
-	var cmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:/home/sysadmin/BlogsWeb.zip /home/sameera/Desktop/Research/Downloads/BlogsWeb.zip"
-
-	exec(cmd, function (err, stdout, stderr) {
-  		res.send(stdout.toString('utf8'));
+		exec(cmd, function (err, stdout, stderr) {
+			res.send(stdout.toString('utf8'));
+		});
+	})
+======================================================================================================================================
+	ftp.get(zipFilePath, destinationPath, function (err) {
+		if (err){
+			console.error('There was an error retrieving the file.');
+			res.send("failed");
+		} else {
+			console.log('File copied successfully!');
+			//TODO: Remove zip file from server
+			res.send("success");			
+		}
 	});
-})
-
-module.exports = router;
+	
+	//var cmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:/home/sysadmin/BlogsWeb.zip /home/sameera/Desktop/Research/Downloads/BlogsWeb.zip"
+======================================================================================================================================
+*/

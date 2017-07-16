@@ -1,4 +1,4 @@
-<section class="content" style="overflow-y:hidden;">
+<section class="content">
 
 	<div class="row">
 		<div class="col-md-6">
@@ -70,21 +70,7 @@
 						<button ng-click='nextButtonClick()' type="button" class="btn btn-box-tool"><i class="fa fa-arrow-right"></i></button>
 					</div>
 				</div>
-				<!--<br/>
-				<div style="height:495px;overflow-y: scroll">
-					<div
-						data-angular-treeview="true"
-						data-tree-id="abc"
-						data-tree-model="treedata"
-						data-node-id="id"
-						data-node-label="label"
-						data-node-path="path"
-						data-node-children="children">
-					</div>
-				</div>
-				<br/>-->
 				<div class="box-body" style="height:535px;overflow-y: scroll">
-					
 					<table class="table-striped" style="width:100%;margin-top: 5px">
 						<tr>
 							<th>File</th>
@@ -110,28 +96,6 @@
 							</td>
 						</tr>
 					</table>
-
-
-
-
-					<!--<br/><br/><br/><br/>
-					<p>
-						<span ng-repeat="data in treedata">
-
-							<span style="cursor:pointer" ng-if="data.type == 0" ng-click="singleClickOnFile(data.name)">
-								<i class="fa fa-file" style="color:gray" aria-hidden="true"></i>&nbsp; {{data.name}}
-								
-								
-								
-							
-								<br/>
-							</span>
-							
-							<span style="cursor:pointer" ng-if="data.type == 1" ng-click="singleClickOnFile(data.name)" ng-dblclick="doubleClickOnFile(data.name)">
-								<i class="fa fa-folder" style="color:#D89238" aria-hidden="true"></i>&nbsp; {{data.name}}<br/>
-							</span>							
-						</span>
-					</p>-->
 				</div>
 				<div class="box-footer">
 					<span class="pull-left" style="margin:0 auto"><b>Selected Folder</b>:&nbsp;{{selectedFolderPath}}</span>
@@ -142,22 +106,5 @@
             	</div>
 			</div>
 		</div>
-	</div>	
-
-<!-- 
-<section class="content">
-
-	<div class="row">
-		<div class="col-md-4">
-			
-		</div>
-		<div class="col-md-8">
-			
-		</div>
 	</div>
-	<div class="row">
-		<div class="col-md-12">
-			
-		</div>
-	</div>
-</section> -->
+</section>
