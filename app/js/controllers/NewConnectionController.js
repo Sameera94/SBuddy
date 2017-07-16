@@ -8,11 +8,37 @@ myApp.controller('NewConnectionController', ['$scope', '$http', '$location', '$r
 	$scope.spinerOfFileSystem = true;
 	$scope.spinerOfConnection = true;
 
-	var getFolderStructure = function () {
-		$http.get('/connection/getTreeStructureFromRemoteServer', {
+	$scope.treedata = [];
+	$scope.selectedFolderPath = ""
+	$scope.currentLocation = ""
+
+	var initialPath = "/home/sysadmin"
+	var pathArray   = ["home","sysadmin"]
+
+	var previousFolder = ""
+	var nextFolder	   = "" 
+
+	var getFolderStructure = function (path) {
+		$scope.spinerOfFileSystem = false;
+		addLogItem("Listing directory contents...",2)
+		
+		$http.post('/connection/getFilesHeirachyOfGivenDirectory', {
+			path: path
 		}).success(function (data) {
-			$scope.treedata = data
-			addLogItem("Connected to file system!",1)
+			var dataArray = []
+			for (var i=0; i<data.length; i++) {
+				if(data[i].type == 0){
+					dataArray.push(data[i])	
+				}
+   			}
+			for (var i=0; i<data.length; i++) {
+				if(data[i].type == 1){
+					dataArray.push(data[i])	
+				}
+   			}
+			$scope.treedata = dataArray
+			addLogItem("Directory listing completed!",1)
+			$scope.currentLocation = getCurrentPath();
 			$scope.spinerOfFileSystem = true;
 		}).error(function (error) {
 			console.log(error);
@@ -22,7 +48,7 @@ myApp.controller('NewConnectionController', ['$scope', '$http', '$location', '$r
 	var addLogItem = function(data,status){
 		var time = new Date();
 
-		$scope.logsArray.push({
+		$scope.logsArray.unshift({
 			"time": time,
 			"data": data,
 			"color": status
@@ -35,10 +61,19 @@ myApp.controller('NewConnectionController', ['$scope', '$http', '$location', '$r
         }, time);
 	}
 
+	var getCurrentPath = function() {
+		var path = ""	
+		for (var i=0; i<pathArray.length; i++) {
+      		path = path + "/" + pathArray[i]
+   		}
+		return path
+	}
+
 	//getFolderStructure();
 	
 	$scope.refreshFileList = function () {
-		getFolderStructure();
+		pathArray = ["home","sysadmin"]
+		getFolderStructure(initialPath);
 	}
 
 	$scope.downloadFolder = function(path) {
@@ -90,13 +125,42 @@ myApp.controller('NewConnectionController', ['$scope', '$http', '$location', '$r
 
         $timeout(function() {
             $scope.spinerOfFileSystem = false;
-        }, 7000);
+        }, 6000);
 		
 		addLogItemWithTimeout("Connected!",1,5000);
-		addLogItemWithTimeout("Connecting to file system...",2,7000);
+		addLogItemWithTimeout("Connecting to file system...",2,6000);
 		$timeout(function() {
-            getFolderStructure();
-        }, 8000);
+			pathArray = ["home","sysadmin"]
+            getFolderStructure(initialPath);
+        }, 7000);
+	}
+
+	$scope.singleClickOnFile = function(path) {
+		$scope.selectedFolderPath = getCurrentPath()+"/"+path
+	}
+
+	$scope.doubleClickOnFile = function(path) {
+		addLogItem("Loading folder heirachy of the "+getCurrentPath()+"/"+path+"...",2)
+		getFolderStructure(getCurrentPath()+"/"+path);
+		pathArray.push(path)
+	}
+
+	$scope.backButtonClick = function() {
+		if(pathArray.length > 0){
+			previousFolder = pathArray.pop();
+			getFolderStructure(getCurrentPath())
+		}
+	}
+
+	$scope.nextButtonClick = function() {
+		if(previousFolder != ""){
+			getFolderStructure(getCurrentPath()+"/"+previousFolder);
+			pathArray.push(previousFolder)
+		}
+	}
+
+	$scope.clearLog = function() {
+		$scope.logsArray = []
 	}
 
 }]);

@@ -11,7 +11,7 @@ var connectionRoutes = require('./routes/connectionRoutes');
 var shellRoutes = require('./routes/shellRoutes');
 var sqlManager = require('./routes/sqlManger');
 
-mongoose.connect("mongodb://localhost:27017/MTIT_Library");
+//mongoose.connect("mongodb://localhost:27017/MTIT_Library");
 
 /*************************
      Configurations
