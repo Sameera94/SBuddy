@@ -59,7 +59,8 @@ router.post('/downloadFolder', function (req, res, next) {
         	console.log("Start downloading...")
 
 		    //download zip file
-		 	var newCmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:"+req.body.path+".zip /home/sameera/Desktop/Research/Downloads/web.zip"
+		 	//var newCmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:"+req.body.path+".zip /home/sameera/Desktop/Research/Downloads/web.zip"
+			var newCmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:"+req.body.path+".zip /Users/vchans5/Desktop/07-13/SBuddy/downloads/"+req.body.name+".zip"
 			exec(newCmd, function (err, stdout, stderr) {
 		  		res.send("success");
 			});

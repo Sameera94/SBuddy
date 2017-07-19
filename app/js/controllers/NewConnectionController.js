@@ -16,7 +16,7 @@ myApp.controller('NewConnectionController', ['$scope', '$http', '$location', '$r
 	var pathArray   = ["home","sysadmin"]
 
 	var previousFolder = ""
-	var nextFolder	   = "" 
+	var selectedFolderName = ""
 
 	var getFolderStructure = function (path) {
 		$scope.spinerOfFileSystem = false;
@@ -81,7 +81,8 @@ myApp.controller('NewConnectionController', ['$scope', '$http', '$location', '$r
 		$scope.spinerOfFileSystem = false;
 
 		$http.post('/connection/downloadFolder', {
-			path: path
+			path: path,
+			name: selectedFolderName 
 		}).success(
 			function (data) {
 				if(data == "success") {
@@ -137,6 +138,7 @@ myApp.controller('NewConnectionController', ['$scope', '$http', '$location', '$r
 
 	$scope.singleClickOnFile = function(path) {
 		$scope.selectedFolderPath = getCurrentPath()+"/"+path
+		selectedFolderName = path
 	}
 
 	$scope.doubleClickOnFile = function(path) {
