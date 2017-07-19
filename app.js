@@ -31,10 +31,10 @@ app.use(cookieParser());
         Routes
 *************************/
 
-app.use('/connection', connectionRoutes);
-app.use('/shell', shellRoutes);
-app.use('/sql', sqlManager);
-app.use('/version', versionManager);
+//app.use('/connection', connectionRoutes);
+//app.use('/shell', shellRoutes);
+//app.use('/sql', sqlManager);
+//app.use('/version', versionManager);
 app.use('/static', pageAnalyzer);
 
 app.get('/', function (req, res) {
