@@ -1,6 +1,0 @@
-name is: Angular Material
-name is: AngularJS
-name is: Express
-name is: Twitter Bootstrap
-name is: jQuery
-name is: Node.js

@@ -50,15 +50,6 @@ router.post('/downloadFolder', function (req, res, next) {
 	var zipFilePath = req.body.path + ".zip"
 	var destinationPath = "/home/sameera/Desktop/SEO-downloads-loc/"
 
-
-
-	// Executing shell scrit
-						exec("sh /home/sameera/Desktop/Prageeth/Runner/MyApp/shellScript.sh", function (err, stdout, stderr) {
-							console.log("Executed")
-							res.send("success");
-						});
-
-/*
 	//create zip file
 	session.execute(rawCommand, function(err, code, logs) {		
 		console.log(logs.stdout);
@@ -66,23 +57,21 @@ router.post('/downloadFolder', function (req, res, next) {
 
         setTimeout(function() {
         	console.log("Start downloading...")
-		    //download zip file
-		 	//var newCmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:"+req.body.path+".zip /home/sameera/Desktop/Research/Downloads/web.zip"
+		    
+		    // Clear folder
 			var newCmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:"+req.body.path+".zip /home/sameera/Desktop/SEO-downloads-loc/"+req.body.name+".zip"
-
-			exec(newCmd, function (err, stdout, stderr) {
+			
+			exec("rm -f /home/sameera/Desktop/SEO-downloads-loc/", function (err, stdout, stderr) {
 				console.log("Downloaded...")
-
-				// CD into folder
-//				exec("cd /home/sameera/Desktop/SEO-downloads-loc/", function (err, stdout, stderr) {
-//					console.log("Current locatiion changed...")
+				
+				//download zip file
+				exec(newCmd, function (err, stdout, stderr) {
+					console.log("Donlod lcation cleared...")
 
 					// unizip downloaded file
 					exec("unzip /home/sameera/Desktop/SEO-downloads-loc/"+req.body.name+".zip -d /home/sameera/Desktop/SEO-downloads-loc/", function (err, stdout, stderr) {
 						console.log("Stdout: "+stdout);
 						console.log("Unziped finished...");
-
-						//unzip /path/to/file.zip
 				
 						// Executing shell scrit
 						exec("sh /home/sameera/Desktop/Prageeth/Runner/MyApp/shellScript.sh", function (err, stdout, stderr) {
@@ -90,11 +79,10 @@ router.post('/downloadFolder', function (req, res, next) {
 							res.send("success");
 						});
 					});
-//				});				
+				});				
 			});
 		}, 5000);
 	});
-	*/
 });
 
 router.get('/getQueryData',function(req,res){
