@@ -50,33 +50,36 @@ router.post('/downloadFolder', function (req, res, next) {
 	var zipFilePath = req.body.path + ".zip"
 	var destinationPath = "/home/sameera/Desktop/SEO-downloads-loc/"
 
-	//create zip fileaa
+	//create zip file
 	session.execute(rawCommand, function(err, code, logs) {		
 		console.log(logs.stdout);
 		console.log("Going to download file: "+zipFilePath+ " and save to: "+destinationPath);
 
         setTimeout(function() {
-        	console.log("Start downloading...")
-		    
-		    // Clear folder
-			var newCmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:"+req.body.path+".zip /home/sameera/Desktop/SEO-downloads-loc/"+req.body.name+".zip"
-			
-			exec("rm -f /home/sameera/Desktop/SEO-downloads-loc/", function (err, stdout, stderr) {
+			// clear downloads folder
+			exec("rm -r /home/sameera/Desktop/SEO-downloads-loc/", function (err, stdout, stderr) {
 				console.log("Downloaded...")
-				
-				//download zip file
-				exec(newCmd, function (err, stdout, stderr) {
-					console.log("Donlod lcation cleared...")
 
-					// unizip downloaded file
-					exec("unzip /home/sameera/Desktop/SEO-downloads-loc/"+req.body.name+".zip -d /home/sameera/Desktop/SEO-downloads-loc/", function (err, stdout, stderr) {
-						console.log("Stdout: "+stdout);
-						console.log("Unziped finished...");
-				
-						// Executing shell scrit
-						exec("sh /home/sameera/Desktop/Prageeth/Runner/MyApp/shellScript.sh", function (err, stdout, stderr) {
-							console.log("Executed")
-							res.send("success");
+				// create downloads directory
+				exec("mkdir /home/sameera/Desktop/SEO-downloads-loc", function (err, stdout, stderr) {
+					console.log("New folder created..")
+
+					// download zip file
+					console.log("Start downloading...")	
+					var newCmd = "sshpass -p 3college! scp sysadmin@10.52.209.6:"+req.body.path+".zip /home/sameera/Desktop/SEO-downloads-loc/"+req.body.name+".zip"
+					exec(newCmd, function (err, stdout, stderr) {
+						console.log("Donlod lcation cleared...")
+
+						// unizip downloaded file
+						exec("unzip /home/sameera/Desktop/SEO-downloads-loc/"+req.body.name+".zip -d /home/sameera/Desktop/SEO-downloads-loc/", function (err, stdout, stderr) {
+							console.log("Stdout: "+stdout);
+							console.log("Unziped finished...");
+					
+							// Executing shell scrit
+							exec("sh /home/sameera/Desktop/Prageeth/Runner/MyApp/shellScript.sh", function (err, stdout, stderr) {
+								console.log("Shell script Executed")
+								res.send("success");
+							});
 						});
 					});
 				});				
