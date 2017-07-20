@@ -50,7 +50,7 @@ router.post('/downloadFolder', function (req, res, next) {
 	var zipFilePath = req.body.path + ".zip"
 	var destinationPath = "/home/sameera/Desktop/SEO-downloads-loc/"
 
-	//create zip file
+	//create zip fileaa
 	session.execute(rawCommand, function(err, code, logs) {		
 		console.log(logs.stdout);
 		console.log("Going to download file: "+zipFilePath+ " and save to: "+destinationPath);
@@ -101,3 +101,14 @@ router.get('/getQueryData',function(req,res){
 });
 
 module.exports = router;
+
+
+// mysql -u root -p   (pw: root)
+
+// SET GLOBAL log_output = 'TABLE';
+// SET GLOBAL general_log = 'ON';
+
+// sudo openconnect vpn1.pearson.com
+// https://hub.docker.com/r/mysql/mysql-server/
+
+// sudo ssh sysadmin@10.52.209.6
