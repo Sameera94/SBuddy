@@ -11,21 +11,21 @@ var pool2 = mysql.createPool({
 });
 
 var pool1 = mysql.createPool({
-	host: 'localhost',
+	host: '172.17.0.4',
 	user: 'root',
 	password: 'root',
 	database: 'mysql'
 });
 
 var pool3 = mysql.createPool({
-	host: 'localhost',
+	host: '172.17.0.4',
 	user: 'root',
 	password: 'root',
 	database: 'node_db'
 });
 
 var pool4 = mysql.createPool({
-	host: 'localhost',
+	host: '172.17.0.4',
 	user: 'root',
 	password: 'root',
 	database: 'information_schema'
@@ -40,6 +40,7 @@ var clearDynamicQueriesTable = function(callback) {
 			if (error) {
 				console.log(error)
 			}
+			console.log("dynamic_queries cleared....")
 			callback()
 		});
 	});
@@ -54,6 +55,7 @@ var clearQuniqueQueriesTable = function(callback) {
 			if (error) {
 				console.log(error)
 			}
+			console.log("unique_queries cleared....")
 			callback()
 		});
 	});
@@ -63,14 +65,20 @@ var clearQuniqueQueriesTable = function(callback) {
 var getAllQueriesFromGenaralSqlTable = function(callback) {
 	pool1.getConnection(function (err, connection) {
 
-		var sql = mysql.format("SELECT DISTINCT(argument) from general_log WHERE command_type = 'Query' AND argument LIKE 'Select%' AND argument NOT LIKE '%tracking_active FROM%' AND argument NOT LIKE '%MAX(version)%' AND argument NOT LIKE '%phpmyadmin%' AND argument NOT LIKE '%information_schema%' AND argument NOT LIKE '%seo_buddy%' AND argument NOT LIKE '%general_log%' AND argument NOT LIKE 'SELECT @@%' AND argument NOT LIKE '%executeMysqlQuery%' order by event_time DESC");
+		//var sql = mysql.format("SELECT DISTINCT(argument) from general_log WHERE command_type = 'Query' AND argument LIKE 'Select%' AND argument NOT LIKE '%tracking_active FROM%' AND argument NOT LIKE '%MAX(version)%' AND argument NOT LIKE '%phpmyadmin%' AND argument NOT LIKE '%information_schema%' AND argument NOT LIKE '%seo_buddy%' AND argument NOT LIKE '%general_log%' AND argument NOT LIKE 'SELECT @@%' AND argument NOT LIKE '%executeMysqlQuery%' order by event_time DESC");
 		//"SELECT DISTINCT(argument) from general_log WHERE command_type = 'Query' AND argument NOT LIKE '%general_log%' AND argument NOT LIKE 'SET %' AND argument NOT LIKE 'SET CHARACTER%' AND argument NOT LIKE 'SHOW TABLE STATUS FROM%' AND argument NOT LIKE '%SELECT CURRENT_USER()%' AND argument NOT LIKE 'SELECT `PRIVILEGE_TYPE` FROM%' order by event_time DESC"
+
+
+		var sql = mysql.format("SELECT argument,event_time from general_log WHERE command_type = 'Query' AND argument LIKE 'select%' AND argument NOT LIKE '%tracking_active FROM%' AND argument NOT LIKE '%MAX(version)%' AND argument NOT LIKE '%phpmyadmin%' AND argument NOT LIKE '%information_schema%' AND argument NOT LIKE '%seo_buddy%' AND argument NOT LIKE '%general_log%' AND argument NOT LIKE 'SELECT @@%' AND argument NOT LIKE '%executeMysqlQuery%' order by event_time DESC");
+		//var sql = mysql.format("SELECT argument from general_log WHERE argument LIKE 'select%'");
 
 		connection.query(sql, function (error, results, fields) {
 			connection.release();
 			if (error) {
 				console.log(error);
 			}
+
+			console.log("getAllQueriesFromGenaralSqlTable: "+results);
 			callback(results)
 		});
 	});
@@ -86,6 +94,7 @@ var getAllQueriesFromDynamicTable = function(callback) {
 			if (error) {
 				console.log(error)
 			}
+			console.log("getAllQueriesFromDynamicTable....");
 			callback(results)
 		});
 	});
@@ -101,6 +110,7 @@ var getAllQueriesFromUniqueTable = function(callback) {
 			if (error) {
 				console.log(error)
 			}
+			console.log("getAllQueriesFromUniqueTable....");
 			callback(results)
 		});
 	});
@@ -118,6 +128,7 @@ var inserRecordIntoDynamicQueryTable = function(data,callback){
 			if (error) {
 				console.log(error)
 			}
+			console.log("INSERT INTO dynamic_queries....")
 			callback();
 		});
 	});
@@ -131,6 +142,7 @@ var executeMysqlQuery = function(query,callback){
 			if (error) {
 				console.log("Error occured when executing query...");
 			}
+			console.log("Execute Mysql Query....")
 			callback(query,results);
 		});
 	});
@@ -149,6 +161,7 @@ var inserRecordIntoUniqueQueryTable = function(query,result,callback){
 			if (error) {
 				console.log("Error occured when inserting result...")
 			}
+			console.log("Insert RecordIntoUnique Query Table....")
 			callback();
 		});
 	});

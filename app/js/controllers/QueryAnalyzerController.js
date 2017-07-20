@@ -22,7 +22,7 @@ myApp.controller('QueryAnalyzerController', ['$scope', '$http', '$location', '$r
 	var addLogItem = function(data,status){
 		var time = new Date();
 
-		$scope.logsArray.push({
+		$scope.logsArray.unshift({
 			"time": time,
 			"data": data,
 			"color": status
