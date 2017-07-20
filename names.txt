@@ -1,0 +1,42 @@
+website is: http://material.angularjs.org
+confidence is: 100
+name is: Angular Material
+version is: 
+categories is: [u'Web Frameworks']
+icon is: Angular.svg
+
+website is: http://angularjs.org
+confidence is: 100
+name is: AngularJS
+version is: 
+categories is: [u'JavaScript Frameworks']
+icon is: AngularJS.svg
+
+website is: http://expressjs.com
+confidence is: 100
+name is: Express
+version is: 
+categories is: [u'Web Frameworks', u'Web Servers']
+icon is: Express.png
+
+website is: http://getbootstrap.com
+confidence is: 100
+name is: Twitter Bootstrap
+version is: 
+categories is: [u'Web Frameworks']
+icon is: Twitter Bootstrap.png
+
+website is: http://jquery.com
+confidence is: 100
+name is: jQuery
+version is: 
+categories is: [u'JavaScript Frameworks']
+icon is: jQuery.svg
+
+website is: http://nodejs.org
+confidence is: 100
+name is: Node.js
+version is: 
+categories is: [u'Programming Languages']
+icon is: node.js.png
+
