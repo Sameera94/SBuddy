@@ -1,6 +1,7 @@
 var express = require("express");
 var router  = express.Router();
 var File    = require("../models/file");
+var fsmonitor = require('fsmonitor');
 
 router.get('/getAllFiles',function(req,res){
 	File.getAllFiles(function(err, files){
@@ -32,5 +33,14 @@ router.post('/addNewVersion', function (req, res) {
 	});
 });
 
+/* File monitoring process */
+router.post('/startMonitor', function (req, res) {
+
+	console.log("Project files monitoring started...")
+
+	fsmonitor.watch(req.body.path, null, function(change) {
+		console.log("Modified file: %j", change.modifiedFiles);
+	});
+});
 
 module.exports = router;

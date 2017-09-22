@@ -11,6 +11,7 @@ var shellRoutes      = require('./routes/shellRoutes');
 var sqlManager	     = require('./routes/sqlManger');
 var versionManager   = require('./routes/versionController');
 var pageAnalyzer     = require('./routes/staticPageAnalyzer');
+var fileMonitor		 = require('./routes/fileMonitor');
 
 mongoose.connect("mongodb://localhost:27017/SEO_Buddy");
 
@@ -36,6 +37,7 @@ app.use('/shell', shellRoutes);
 app.use('/sql', sqlManager);
 app.use('/version', versionManager);
 app.use('/static', pageAnalyzer);
+app.use('/fileMonitor', fileMonitor);
 
 app.get('/', function (req, res) {
    res.sendfile('app/index.html');

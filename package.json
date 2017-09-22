@@ -26,6 +26,7 @@
     "easy-ftp": "~0.3.34",
     "express": "^4.13.3",
     "express-session": "^1.14.1",
+    "fsmonitor": "^0.2.4",
     "ftp": "^0.3.10",
     "ftp-simple": "~0.1.22",
     "ftpsync": "^0.2.0",
@@ -39,6 +40,7 @@
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "remote-exec": "0.0.3",
+    "shortid": "^2.2.8",
     "website-scraper": "^2.4.0"
   },
   "devDependencies": {
