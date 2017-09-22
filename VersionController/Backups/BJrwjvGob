@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+
+<head>
+    <title>Custom Editor - SL Mobile Engineering</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="cosadnf.js"></script>
+</head>
+
+<body>
+    <h2>Accounting Table Specification</h2>
+    <div id="table-area">
+        <table class="accounting-table">
+            <tr>
+                <th class="col-date">Date</th>
+                <th class="col-accounts">Accounts</th>
+                <th class="col-dc">Debit</th>
+                <th class="col-dc">Credit</th>
+            </tr>
+            <tr id="first-row">
+                <td></td>
+                <td>Petty Cash</td>
+                <td class="col-amount">500</td>
+                <td class="col-amount"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td class="col-credit-desc">Cash</td>
+                <td class="col-amount"></td>
+                <td class="col-amount">500</td>
+            </tr>
+        </table>
+    </div>
+    <h2>Accouting Table Editor</h2>
+    <textarea></textarea>
+    <h2>Content Preview</h2>
+    <div id="content-previewer">
+    </div>
+    <br>
+    <footer>
+        &copy2017 Customized Editor for Accounting Purposes - Developed By Pearson SL Mobile Engineering
+    </footer>
+</body>
+
+</html>
