@@ -1,0 +1,118 @@
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.acorn = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+
+
+// The main exported interface (under `self.acorn` when in the
+// browser) is a `parse` function that takes a code string and
+// returns an abstract syntax tree as specified by [Mozilla parser
+// API][api].
+//
+// [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
+
+"use strict";
+
+exports.parse = parse;
+
+// This function tries to parse a single expression at a given
+// offset in a string. Useful for parsing mixed-language formats
+// that embed JavaScript expressions.
+
+exports.parseExpressionAt = parseExpressionAt;
+
+// Acorn is organized as a tokenizer and a recursive-descent parser.
+// The `tokenize` export provides an interface to the tokenizer.
+
+exports.tokenizer = tokenizer;
+exports.__esModule = true;
+// Acorn is a tiny, fast JavaScript parser written in JavaScript.
+//
+// Acorn was written by Marijn Haverbeke, Ingvar Stepanyan, and
+// various contributors and released under an MIT license.
+//
+// Git repositories for Acorn are available at
+//
+//     http://marijnhaverbeke.nl/git/acorn
+//     https://github.com/marijnh/acorn.git
+//
+// Please use the [github bug tracker][ghbt] to report issues.
+//
+// [ghbt]: https://github.com/marijnh/acorn/issues
+//
+// This file defines the main parser interface. The library also comes
+// with a [error-tolerant parser][dammit] and an
+// [abstract syntax tree walker][walk], defined in other files.
+//
+// [dammit]: acorn_loose.js
+// [walk]: util/walk.js
+
+var _state = _dereq_("./state");
+
+var Parser = _state.Parser;
+
+var _options = _dereq_("./options");
+
+var getOptions = _options.getOptions;
+
+_dereq_("./parseutil");
+
+_dereq_("./statement");
+
+_dereq_("./lval");
+
+_dereq_("./expression");
+
+exports.Parser = _state.Parser;
+exports.plugins = _state.plugins;
+exports.defaultOptions = _options.defaultOptions;
+
+var _location = _dereq_("./location");
+
+exports.SourceLocation = _location.SourceLocation;
+exports.getLineInfo = _location.getLineInfo;
+exports.Node = _dereq_("./node").Node;
+
+var _tokentype = _dereq_("./tokentype");
+
+exports.TokenType = _tokentype.TokenType;
+exports.tokTypes = _tokentype.types;
+
+var _tokencontext = _dereq_("./tokencontext");
+
+exports.TokContext = _tokencontext.TokContext;
+exports.tokContexts = _tokencontext.types;
+
+var _identifier = _dereq_("./identifier");
+
+exports.isIdentifierChar = _identifier.isIdentifierChar;
+exports.isIdentifierStart = _identifier.isIdentifierStart;
+exports.Token = _dereq_("./tokenize").Token;
+
+var _whitespace = _dereq_("./whitespace");
+
+exports.isNewLine = _whitespace.isNewLine;
+exports.lineBreak = _whitespace.lineBreak;
+exports.lineBreakG = _whitespace.lineBreakG;
+var version = "1.2.2";exports.version = version;
+
+function parse(input, options) {
+  var p = parser(options, input);
+  var startPos = p.pos,
+      startLoc = p.options.locations && p.curPosition();
+  p.nextToken();
+  return p.parseTopLevel(p.options.program || p.startNodeAt(startPos, startLoc));
+}
+
+function parseExpressionAt(input, pos, options) {
+  var p = parser(options, input, pos);
+  p.nextToken();
+  return p.parseExpression();
+}
+
+function tokenizer(input, options) {
+  return parser(options, input);
+}
+
+function parser(options, input) {
+  return new Parser(getOptions(options), String(input));
+}
+
+},{"./expression":6,"./identifier":7,"./loc

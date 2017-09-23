@@ -3,7 +3,6 @@
 	<div class="row">
 		<div class="col-md-12">
 			<div class="row">
-				<button ng-click='ssssss()'>GetData</button>
 				<div class="col-md-12">
 					<div class="box box-primary">
 						<div class="box-header with-border" style="padding-left:15px">
@@ -13,20 +12,28 @@
 							<table id="example1" class="table table-bordered table-striped">
 								<thead>
 									<tr>
+										<th style="width:4%">#</th>
 										<th style="width:18%">Original File</th>
-										<th style="width:18%">Location</th>
-										<th style="width:64%">Versions</th>
+										<th style="width:28%">Location</th>
+										<th style="width:35%">Versions</th>
+										<th style="width:15%">Restore</th>
 									</tr>
 								</thead>
 								<tbody>
-									<tr ng-repeat="fd in fileData">
-										<td>{{fd['file']}}</td>
-										<td></td>
+									<tr ng-repeat="file in fileData">
+										<td>{{file.file.id}}</td>
+										<td>{{file.file.file_name}}</td>
+										<td>{{file.file.original_path}}</td>
 										<td>
-											Win 95+ <br/>
-											Win 95+ <br/>
-											Win 95+ <br/>
-											Win 95+ <br/>
+											<table>
+												<tr ng-repeat="update in file.sub">
+													<td>V{{ update.id }} - {{ update.randomName }}&nbsp;&nbsp;&nbsp;</td>
+													<td><span class="btn badge bg-orange" ng-click='restoreUpdate(update.id)'>Restore</span></td>
+												</tr>
+											</table>
+										</td>
+										<td>
+											<button type="button" ng-click='restoreFile(file.file.id)' class="btn btn-primary" id="sendEmail" style="margin-right: 3px">Restore</button>
 										</td>
 									</tr>
 									

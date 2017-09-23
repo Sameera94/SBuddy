@@ -11,11 +11,11 @@ var pool = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
 	password: 'root',
-	database: 'seo_buddy',
-	socketPath : '/Applications/MAMP/tmp/mysql/mysql.sock',
+	database: 'seo_buddy'
 });
 
-var homePath = "/Users/vchans5/Desktop/09-21/SBuddy/VersionController/"
+//var homePath = "/Users/vchans5/Desktop/09-21/SBuddy/VersionController/"
+var homePath = "/home/sameera/Desktop/SEPTEMBER/SBuddy/VersionController/"
 var projectLocation = ""
 var projectName = ""
 
@@ -29,6 +29,10 @@ router.post('/startMonitor', function (req, res) {
 	console.log("****** Version Controller Started ******")
 	console.log("****************************************\n")
 
+	// Save project name and location
+	projectLocation = req.body.path;
+	projectName = req.body.projectName;
+
 	// Start the monitor
 	console.log("Project files monitoring started..")
 	fsmonitor.watch(req.body.path, null, function(change) {
@@ -36,10 +40,6 @@ router.post('/startMonitor', function (req, res) {
 		var originalFile = originalBackupFileLocation + projectName + "_Backup/" + projectName + "/" + change.modifiedFiles[0];
 		insertNewFileIntoDB(path.basename(change.modifiedFiles[0]), change.modifiedFiles[0], originalFile, shortid.generate())
 	});
-
-	// Save project name and location
-	projectLocation = req.body.path;
-	projectName = req.body.projectName;
 
 	// Create new folder in OriginalBackup for the project
 	exec("mkdir " + originalBackupFileLocation + projectName + "_Backup", function (err, stdout, stderr) {
@@ -106,6 +106,7 @@ var checkFileExist = function(originalPath, callback) {
 }
 
 var insertNewFileUpdate = function(fileId, randomName, location) {
+
 	pool.getConnection(function (err, connection) {
 		
 		var values = {
@@ -122,6 +123,57 @@ var insertNewFileUpdate = function(fileId, randomName, location) {
 		});
 	});
 }
+
+/* File Restoring process */
+// Params: orginal file id (req.body.fileId)
+// Params: client project location (req.body.path)
+router.post('/restoreFileIntoOriginalState', function (req, res) {
+	// get file from original backup location
+	pool.getConnection(function (err, connection) {
+		var sql = mysql.format("select * from file_monitor_main WHERE id = ?", req.body.fileId);
+		connection.query(sql, function (error, results, fields) {
+			 
+			if(results.length == 1) {
+
+				// Replace file in project location
+				exec("cp " + results[0].original_file + " " + req.body.path + results[0].original_path, function (err, stdout, stderr) {
+				 	console.log("File restored successfully!")
+					console.log(stderr)
+
+					// Delete record from database
+					pool.getConnection(function (err, connection) {
+						var sql = mysql.format("DELETE FROM file_monitor_main WHERE id = ?", req.body.fileId);
+
+						connection.query(sql, function (error, results, fields) {
+							connection.release();
+							if (error) {
+								console.log(error)
+							}
+							res.send("success")
+						});
+					});
+				});
+			} else {
+				console.log("Restore failed")
+				res.send("failed")
+			}
+		});
+	});
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.post('/testdb', function (req, res) {
 });
