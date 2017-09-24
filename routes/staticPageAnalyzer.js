@@ -153,7 +153,8 @@ var saveFileUpdateContents = function(filePath, originalContent, newContent, rep
 			filePath: filePath,
 			originalContent: originalContent,
 			newContent: newContent,
-			replacedBy: replacedBy
+			replacedBy: replacedBy,
+			action: 3
 		};
 
 		connection.query('INSERT INTO file_replace_info SET ?', values, function (error, results, fields) {

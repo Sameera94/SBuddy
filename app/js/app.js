@@ -14,6 +14,10 @@ myApp.config(['$routeProvider', function($routeProvider) {
         templateUrl: 'views/versionController.html',
         controller: 'VersionController'
     }).
+    when('/liveApp', {
+        templateUrl: 'views/liveApp.html',
+        controller: 'LiveAppController'
+    }).
 	
     otherwise({
         redirectTo: '/newConnection'

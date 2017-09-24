@@ -1,9 +1,9 @@
 var express = require("express");
-var router  = express.Router();
-var File    = require("../models/file");
+var router = express.Router();
+var File = require("../models/file");
 var fsmonitor = require('fsmonitor');
 var mysql = require('mysql');
-var async     = require("async");
+var async = require("async");
 var path = require('path');
 
 var pool = mysql.createPool({
@@ -21,11 +21,11 @@ var pool = mysql.createPool({
 // 	socketPath : '/Applications/MAMP/tmp/mysql/mysql.sock',
 // });
 
-var getSubs = function(files, cb) {
+var getSubs = function (files, cb) {
 	var selectedFiles = []
 	async.forEach(files, function (file, callback) {
 		pool.getConnection(function (err, connection) {
-			connection.query("SELECT * FROM file_monitor_file_updates WHERE fileId=?",file.id, function (error, results, fields) {
+			connection.query("SELECT * FROM file_monitor_file_updates WHERE fileId=?", file.id, function (error, results, fields) {
 				connection.release();
 				if (error) {
 					console.log("Error occured getting result...")
@@ -50,7 +50,7 @@ router.get('/getSubs', function (req, res) {
 			if (error) {
 				res.send(error);
 			}
-			getSubs(results, function(files){
+			getSubs(results, function (files) {
 				res.send(files);
 			})
 		});
@@ -58,7 +58,47 @@ router.get('/getSubs', function (req, res) {
 });
 
 
+router.post('/getAllModifications', function (req, res, next) {
+	
+	console.log("Came")
+	pool.getConnection(function (err, connection) {
+		connection.query("SELECT * FROM file_replace_info WHERE replacedBy=?", req.body.replacedBy, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log("Error occured getting result...")
+			}
+			res.send(results);
+		});
+	});
+});
 
+router.post('/acceptChange', function (req, res, next) {
+	
+	pool.getConnection(function (err, connection) {
+		console.log(req.body.id)
+		connection.query("UPDATE file_replace_info SET action = 1 WHERE id=?", req.body.id, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log("Error occured getting result...")
+			}
+			res.send(results);
+		});
+	});
+});
+
+router.post('/rejectChange', function (req, res, next) {
+	
+	pool.getConnection(function (err, connection) {
+		console.log(req.body.id)
+		connection.query("UPDATE file_replace_info SET action = 0 WHERE id=?", req.body.id, function (error, results, fields) {
+			connection.release();
+			if (error) {
+				console.log("Error occured getting result...")
+			}
+			res.send(results);
+		});
+	});
+});
 
 
 
@@ -71,7 +111,7 @@ router.get('/getSubs', function (req, res) {
 // });
 
 // router.post('/addNewFile', function (req, res) {
-	
+
 // 	var newFile = new File({
 // 		originaFileName      : req.body.originaFileName,
 // 		originalFileLocation : req.body.originalFileLocation,
@@ -85,7 +125,7 @@ router.get('/getSubs', function (req, res) {
 // });
 
 // router.post('/addNewVersion', function (req, res) {
-	
+
 // 	File.addNewVersion(req.body.file, req.body.vName, req.body.version, req.body.path, function (err,file) {
 // 		if(err) throw err;
 // 		res.send(file);

@@ -43,6 +43,10 @@ app.get('/', function (req, res) {
    res.sendfile('app/index.html');
 });
 
+app.get('/client', function (req, res) {
+   res.sendfile('app2/index.html');
+});
+
 /*************************
         Server
 *************************/
